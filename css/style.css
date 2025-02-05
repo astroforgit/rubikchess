@@ -1,37 +1,38 @@
-html, body {
-	height: 100%;
-	margin: 0px;
-	overflow: hidden;
-}
-
 body {
-	background-color: #777;
-	color: white;
-	text-shadow: 0px 1px 1px black;
-	text-align: center;
-	font-family: sans-serif;
+    margin: 0;
+    overflow: hidden;
+    background: #1a1a1a;
+    perspective: 1000px;
 }
 
-h1 { 
-	text-align: center;
-	margin-top: 0px;
-	padding-top: 1em;
+.cube-container {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform-style: preserve-3d;
 }
 
-footer {
-	position: fixed;
-	text-align: center;
-	width: 100%;
-	left: 0px;
-	bottom: 3px;
-	font-size: 90%;
-}
-
-a {
-	color: white;
+.cube {
+    position: absolute;
+    transform-style: preserve-3d;
 }
 
 .face {
-	border: 2px solid black;
-	border-radius: 10px;
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid #000;
+    box-sizing: border-box;
+    backface-visibility: hidden;
 }
+
+/* Face colors */
+.front { background: #ff0000; }
+.back { background: #0000ff; }
+.left { background: #00ff00; }
+.right { background: #ffff00; }
+.top { background: #00ffff; }
+.bottom { background: #008080; }
