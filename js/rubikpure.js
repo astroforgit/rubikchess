@@ -71,64 +71,72 @@ class Cube {
 }
 
 class RubiksCube {
+    static SIZE = 3;
+  
+    #cubes = [];
+    #rotation = Quaternion.fromRotation([1, 0, 0], -35)
+                        .multiply(Quaternion.fromRotation([0, 1, 0], 45));
+    #isDragging = false;
+    #startX = 0;
+    #startY = 0;
+  
     constructor(container) {
-        this.SIZE = 3;
-        this.cubes = [];
-        this.rotation = Quaternion.fromRotation([1, 0, 0], -35)
-                          .multiply(Quaternion.fromRotation([0, 1, 0], 45));
-        this.container = container;
-        this.init();
+      this.container = container;
+      this.#init();
     }
-
-    init() {        
-        for (let z = 0; z < this.SIZE; z++) {
-            for (let y = 0; y < this.SIZE; y++) {
-                for (let x = 0; x < this.SIZE; x++) {
-                    const cube = new Cube(x, y, z);
-                    this.container.appendChild(cube.node);
-                    this.cubes.push(cube);
-                }
-            }
+  
+    #init() {        
+      for (let z = 0; z < RubiksCube.SIZE; z++) {
+        for (let y = 0; y < RubiksCube.SIZE; y++) {
+          for (let x = 0; x < RubiksCube.SIZE; x++) {
+            const cube = new Cube(x, y, z);
+            this.container.appendChild(cube.node);
+            this.#cubes.push(cube);
+          }
         }
+      }
+      
+      this.#updateRotation();
+      this.#addEventListeners();
+    }
+  
+    #updateRotation() {
+      this.container.style.transform = `
+        translateZ(300px)
+        ${this.#rotation.toRotation()}
+      `;
+    }
+  
+    #addEventListeners() {
+      const handleMouseDown = ({ clientX, clientY }) => {
+        this.#isDragging = true;
+        [this.#startX, this.#startY] = [clientX, clientY];
+      };
+  
+      const handleMouseMove = ({ clientX, clientY }) => {
+        if (!this.#isDragging) return;
         
-        this.updateRotation();
-        this.addEventListeners();
-    }
-
-    updateRotation() {
-        this.container.style.transform = `
-            translateZ(300px)
-            ${this.rotation.toRotation()}
-        `;
-    }
-
-    addEventListeners() {
-        let isDragging = false;
-        let startX, startY;
+        const dx = clientX - this.#startX;
+        const dy = clientY - this.#startY;
         
-        document.addEventListener('mousedown', e => {
-            isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-        });
-
-        document.addEventListener('mousemove', e => {
-            if (!isDragging) return;
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            
-            const rotY = Quaternion.fromRotation([0, 1, 0], dx * 0.5);
-            const rotX = Quaternion.fromRotation([1, 0, 0], dy * 0.5);
-            this.rotation = rotX.multiply(rotY).multiply(this.rotation);
-            this.updateRotation();
-            
-            startX = e.clientX;
-            startY = e.clientY;
-        });
-
-        document.addEventListener('mouseup', () => isDragging = false);
+        const rotY = Quaternion.fromRotation([0, 1, 0], dx * 0.5);
+        const rotX = Quaternion.fromRotation([1, 0, 0], dy * 0.5);
+        this.#rotation = rotX.multiply(rotY).multiply(this.#rotation);
+        this.#updateRotation();
+        
+        [this.#startX, this.#startY] = [clientX, clientY];
+      };
+  
+      const handleMouseUp = () => {
+        this.#isDragging = false;
+      };
+  
+      document.addEventListener('mousedown', handleMouseDown);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     }
-}
+  }
+
 window.addEventListener("load", (event) => {
     debugger; 
     const container = document.querySelector('.cube-container');
